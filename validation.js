@@ -15,5 +15,38 @@ const validateLogin = [
   body("firstName").notEmpty().withMessage("First name is required"),
   body("lastName").notEmpty().withMessage("Last name is required"),
 ];
-
-module.exports = validateLogin;
+const validateRegister = [
+    // Email validation: Proper format and domain restriction
+    body("email")
+      .isEmail().withMessage("Invalid email format")
+      .matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[edu]{3}$/) // Only allows ".edu" emails
+      .withMessage("Only college emails (.edu) are allowed"),
+  
+    // Password validation: Strength enforcement
+    body("password")
+      .isLength({ min: 8 }).withMessage("Password must be at least 8 characters")
+      .matches(/[A-Z]/).withMessage("Password must contain at least one uppercase letter")
+      .matches(/[0-9]/).withMessage("Password must contain at least one number")
+      .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage("Password must contain at least one special character"),
+  
+    // Password copy validation
+    body("passwordCopy").custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error("Passwords do not match");
+      }
+      return true;
+    }),
+  
+    // Name validation: Prevents empty values and restricts length
+    body("firstName")
+      .notEmpty().withMessage("First name is required")
+      .isLength({ min: 2, max: 30 }).withMessage("First name must be between 2 and 30 characters")
+      .matches(/^[a-zA-Z]+$/).withMessage("First name must contain only letters"),
+  
+    body("lastName")
+      .notEmpty().withMessage("Last name is required")
+      .isLength({ min: 2, max: 30 }).withMessage("Last name must be between 2 and 30 characters")
+      .matches(/^[a-zA-Z]+$/).withMessage("Last name must contain only letters"),
+  ];
+  
+module.exports = {validateLogin, validateRegister};
