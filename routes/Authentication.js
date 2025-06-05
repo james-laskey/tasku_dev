@@ -1,4 +1,7 @@
 const { validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const { v4: uuidv4 } = require("uuid");
 const pool = require("../db");
 
 // Login handler
@@ -22,8 +25,16 @@ const login = async (req, res) => {
     if (user.password !== password) {
       return res.status(401).json({ error: "Invalid password" });
     }
+    // Create JWT token
+    const token = jwt.sign(
+        { userId: user.id, email: user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" } // Token expires in 1 hour
+      );
+  
+  
 
-    res.status(200).json({ message: `Welcome, ${user.username}!` });
+    res.status(200).json({ token, message: `Welcome, ${user.first_name} ${user.last_name}!` });
   } catch (error) {
     console.error("Database error:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -37,25 +48,24 @@ const register = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
   
-    const { email, password, passwordCopy, username } = req.body;
+    const { email, password, firstname, lastname } = req.body;
   
-    // Ensure passwords match
-    if (password !== passwordCopy) {
-      return res.status(400).json({ error: "Passwords do not match!" });
-    }
-  
+
     try {
       // Check if email is an accepted college email
-      const collegeCheck = await pool.query("SELECT email FROM college WHERE email = $1", [email]);
-      if (collegeCheck.rows.length === 0) {
+      const domainCheck = await pool.query("SELECT email FROM domains WHERE email = $1", [email]);
+      if (domainCheck.rows.length === 0) {
         return res.status(403).json({ error: "Email is not an accepted college email!" });
       }
-  
+      const uid = uuidv4();
+
       // Insert user into database
-      await pool.query("INSERT INTO users (email, password, username) VALUES ($1, $2, $3)", [
+      await pool.query("INSERT INTO users (uid, email, password, firstname, lastname) VALUES ($1, $2, $3, $4, $5)", [
+        uid,
         email,
         password,
-        username,
+        firstname,
+        lastname
       ]);
   
       res.status(201).json({ message: "User registered successfully!" });

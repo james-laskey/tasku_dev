@@ -40,4 +40,19 @@ const validateRegister = () => [
     .matches(/^[a-zA-Z]+$/).withMessage("Last name must contain only letters"),
 ];
 
-module.exports = { validateLogin, validateRegister};
+const validateTask = () => {
+    return [
+      body("user").notEmpty().withMessage("User is required"),
+      body("datetimestamp").isISO8601().withMessage("Invalid date format"),
+      body("description").notEmpty().withMessage("Description is required"),
+      body("offer").isInt({ min: 0 }).withMessage("Offer must be a valid integer"),
+      body("address").notEmpty().withMessage("Address is required"),
+      body("coordinates").isArray({ min: 2, max: 2 }).withMessage("Coordinates must be an array of two floats"),
+      body("completed").isBoolean().withMessage("Completed must be a boolean value"),
+      body("accepteduser").optional().isInt().withMessage("Accepted user must be a valid user ID"),
+      body("rating").optional().isInt({ min: 1, max: 5 }).withMessage("Rating must be between 1 and 5"),
+      body("review").optional().isString().withMessage("Review must be a valid string"),
+    ];
+  };
+  
+module.exports = { validateLogin, validateRegister, validateTask };

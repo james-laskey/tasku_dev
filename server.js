@@ -4,8 +4,10 @@ const { body, validationResult } = require("express-validator");
 var bodyParser = require("body-parser");
 
 
-const { validateLogin, validateRegister }  = require("./validation");
+const { validateLogin, validateRegister, validateTask}  = require("./validation");
 const { login, register } = require("./routes/Authentication");
+const { createTask, getUncompletedTasks } = require("./routes/tasks");
+const authenticateJWT = require("./jwt");
 const pool = require("./db");
 
 let app = express();
@@ -23,6 +25,8 @@ console.log(typeof login, typeof register, typeof validateLogin, typeof validate
   // Login Route using PostgreSQL
   app.post("/login", validateLogin(), (req, res) => login(req, res));
   app.post("/register", validateRegister(), (req, res) => register(req, res));
+  app.post("/createTask", authenticateJWT, validateTask(), (req,res) => createTask(req,res))
+  app.post("getUncompletedTasks", authenticateJWT, async (req, res) => getUncompletedTasks(req, res));
   
 
 app.get("/", (req, res) => res.sendStatus(200));
