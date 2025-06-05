@@ -2,12 +2,11 @@ require("dotenv").config();
 const express = require("express");
 const { body, validationResult } = require("express-validator");
 var bodyParser = require("body-parser");
-const { Pool } = require("pg");
 
-const validateLogin = require("./validation");
-const validateRegister = require("./validation");
-const login = require("./routes/Authentication");
-const register = require("./routes/Authentication");
+
+const { validateLogin, validateRegister }  = require("./validation");
+const { login, register } = require("./routes/Authentication");
+const pool = require("./db");
 
 let app = express();
 
@@ -20,19 +19,10 @@ var server = app.listen(PORT, function () {
   console.log("Listening on port number %d", server.address().port);
 });
 
-// Validation middleware
-const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
-
-  });
-  
+console.log(typeof login, typeof register, typeof validateLogin, typeof validateRegister);
   // Login Route using PostgreSQL
-  app.post("/login", validateLogin, login);
-  app.post("/register", validateRegister, register);
+  app.post("/login", validateLogin(), (req, res) => login(req, res));
+  app.post("/register", validateRegister(), (req, res) => register(req, res));
   
 
 app.get("/", (req, res) => res.sendStatus(200));
