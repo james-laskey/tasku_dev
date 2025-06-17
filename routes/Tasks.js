@@ -2,17 +2,22 @@ const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const pool = require("../db");
+const { v4: uuidv4 } = require("uuid");
+
 
 const createTask = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-  
+    
+    const taskid = uuidv4();
+
     const {
       user,
       school,
       datetimestamp,
+      title,
       description,
       offer,
       address,
@@ -25,9 +30,9 @@ const createTask = async (req, res) => {
   
     try {
       const result = await pool.query(
-        `INSERT INTO tasks (user, school, datetimestamp, description, offer, address, coordinates, completed, accepteduser, rating, review) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
-        [user, school, datetimestamp, description, offer, address, coordinates, completed, accepteduser, rating, review]
+        `INSERT INTO tasks (taskid, user, school, datetimestamp, title, description, offer, address, coordinates, completed, accepteduser, rating, review) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
+        [taskid, user, school, datetimestamp, title, description, offer, address, coordinates, completed, accepteduser, rating, review]
       );
   
       res.status(201).json({ message: "Task created successfully!", task: result.rows[0] });

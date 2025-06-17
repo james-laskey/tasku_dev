@@ -27,7 +27,7 @@ const login = async (req, res) => {
     }
     // Create JWT token
     const token = jwt.sign(
-        { userId: user.id, email: user.email },
+        { userId: user.uid, email: user.email },
         process.env.JWT_SECRET,
         { expiresIn: "1h" } // Token expires in 1 hour
       );
@@ -58,10 +58,15 @@ const register = async (req, res) => {
         return res.status(403).json({ error: "Email is not an accepted college email!" });
       }
       const uid = uuidv4();
-
+      const token = jwt.sign(
+        { userId: uid, email: user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" } // Token expires in 1 hour
+      );
       // Insert user into database
-      await pool.query("INSERT INTO users (uid, email, password, firstname, lastname) VALUES ($1, $2, $3, $4, $5)", [
+      await pool.query("INSERT INTO users (uid, token, email, password, firstname, lastname) VALUES ($1, $2, $3, $4, $5, $6)", [
         uid,
+        token,
         email,
         password,
         firstname,
