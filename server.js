@@ -6,6 +6,7 @@ var bodyParser = require("body-parser");
 const { validateLogin, validateRegister } = require("./validation");
 const { login, register } = require("./routes/Authentication");
 const profileRoutes = require("./routes/Profile");
+const messageRoutes = require("./routes/Messages");
 const pool = require("./db");
 
 let app = express();
@@ -16,6 +17,7 @@ app.use(express.static("src"));
 
 // Register routes
 app.use("/profile", profileRoutes);
+app.use("/messages", messageRoutes);
 app.post("/login", validateLogin(), (req, res) => login(req, res));
 app.post("/register", validateRegister(), (req, res) => register(req, res));
 
