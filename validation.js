@@ -1,4 +1,4 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 
 const validateLogin = () => [
   body("email").isEmail().withMessage("Invalid email format"),
@@ -54,5 +54,30 @@ const validateTask = () => {
       body("review").optional().isString().withMessage("Review must be a valid string"),
     ];
   };
+// ─── Profile validators ────────────────────────────────────────────────────────
+const validateProfileUID = () => [
+  param("uid")
+    .isUUID().withMessage("Invalid user ID format")
+];
+
+const validateProfileBody = () => [
+  body("firstname")
+    .trim()
+    .notEmpty().withMessage("First name is required")
+    .isLength({ max: 50 }).withMessage("First name too long"),
+  body("lastname")
+    .trim()
+    .notEmpty().withMessage("Last name is required")
+    .isLength({ max: 50 }).withMessage("Last name too long"),
+  body("school")
+    .optional({ nullable: true })
+    .trim()
+    .isLength({ max: 100 }).withMessage("School name too long"),
+  body("bio")
+    .optional({ nullable: true })
+    .trim()
+    .isLength({ max: 500 }).withMessage("Bio too long")
+];
+
   
-module.exports = { validateLogin, validateRegister, validateTask };
+module.exports = { validateLogin, validateRegister, validateTask, validateProfileBody, validateProfileUID };
