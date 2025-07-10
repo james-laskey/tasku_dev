@@ -4,7 +4,7 @@ const { body, validationResult } = require("express-validator");
 var bodyParser = require("body-parser");
 
 
-const { validateLogin, validateRegister, validateTask, validateRanking }  = require("./validation");
+const { validateLogin, validateRegister, validateTask, validateRanking, validateProfileUID, validateProfileBody }  = require("./validation");
 const { login, register } = require("./routes/Authentication");
 const { createTask, getUncompletedTasks } = require("./routes/tasks");
 const { getRankings } = require("./routes/Rankings");
