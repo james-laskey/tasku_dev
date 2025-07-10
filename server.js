@@ -31,6 +31,5 @@ console.log(typeof login, typeof register, typeof validateLogin, typeof validate
   app.post("getUncompletedTasks", authenticateJWT, async (req, res) => getUncompletedTasks(req, res));
   app.get("/profile/:uid",authenticateJWT, validateProfileUID(), (req, res) => getProfile(req, res));
   app.put("/profile/:uid", authenticateJWT, validateProfileUID(), validateProfileBody(), (req, res) => updateProfile(req, res));
-  app.get("/rankings",  authenticateJWT,  validateRanking(),  (req, res) => getRankings(req, res));
 
 app.get("/", (req, res) => res.sendStatus(200));
