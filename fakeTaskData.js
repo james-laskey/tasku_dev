@@ -13,5 +13,15 @@ const tasks = [
     "review": "Great experience completing this task!"
     },
 ]
-
+const users =[
+    defaultUser = {
+        "uid": "12345",
+        "email": "defaultuser@berkeley.edu",
+        "password": "$2b$12$EsyKr8v3.rgEZZ/pELvOY.2s/UXGL1dMl7koudy1AG3iQr988Y9.y!",//Tasku2025!
+        "firstname": "Default",
+        "lastname": "User",
+        "school": "University of California, Berkeley",
+        
+    }
+]
 module.exports = {tasks}

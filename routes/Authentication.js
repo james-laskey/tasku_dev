@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const saltRounds = 12;
 const { v4: uuidv4 } = require("uuid");
 const pool = require("../db");
 
@@ -12,33 +13,40 @@ const login = async (req, res) => {
   }
 
   const { email, password } = req.body;
+  if(email === undefined || password === undefined) {
+    return res.status(400).json({ error: "Email and password are required or invalid" });
+  } else {
+      try {
+        const result = await pool.query("SELECT username, firstname, lastname, uid, password FROM users WHERE email = $1 AND password = $2", [email, password]);
+        if (result.rows.length === 0) {
+          return res.status(401).json({ error: "User not found" });
+        }
 
-  try {
-    const result = await pool.query("SELECT username, password FROM users WHERE email = $1", [email]);
+        const user = result.rows[0];
 
-    if (result.rows.length === 0) {
-      return res.status(401).json({ error: "User not found" });
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+          return res.status(401).json({ error: "Email and password are required or invalid" });
+        }
+
+        // Create JWT token
+        const token = jwt.sign(
+            { userId: user.uid, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" } // Token expires in 1 hour
+          );
+      
+      
+        res.status(200).json({ token, message: `Welcome, ${user.firstname} ${user.lastname}!` });
+    } catch (error) {
+      console.error("Database error:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
-
-    const user = result.rows[0];
-
-    if (user.password !== password) {
-      return res.status(401).json({ error: "Invalid password" });
-    }
-    // Create JWT token
-    const token = jwt.sign(
-        { userId: user.uid, email: user.email },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" } // Token expires in 1 hour
-      );
-  
-  
-
-    res.status(200).json({ token, message: `Welcome, ${user.first_name} ${user.last_name}!` });
-  } catch (error) {
-    console.error("Database error:", error);
-    res.status(500).json({ error: "Internal server error" });
   }
+
+  
+
+  
 };
 
 // Example additional handler for user registration
@@ -64,11 +72,12 @@ const register = async (req, res) => {
         { expiresIn: "1h" } // Token expires in 1 hour
       );
       // Insert user into database
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
       await pool.query("INSERT INTO users (uid, token, email, password, firstname, lastname) VALUES ($1, $2, $3, $4, $5, $6)", [
         uid,
         token,
         email,
-        password,
+        hashedPassword,
         firstname,
         lastname
       ]);
