@@ -5,13 +5,7 @@ const validateLogin = () => [
   body("password")
     .isLength({ min: 8 }).withMessage("Password must be at least 8 characters")
     .matches(/[A-Z]/).withMessage("Password must contain at least one uppercase letter")
-    .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage("Password must contain at least one special character"),
-  body("passwordCopy").custom((value, { req }) => {
-    if (value !== req.body.password) {
-      throw new Error("Passwords do not match");
-    }
-    return true;
-  }),
+    .matches(/[!@#$%^&*(),.?":{}|<>]/).withMessage("Password must contain at least one special character")
 ];
 
 const validateRegister = () => [
@@ -49,7 +43,6 @@ const validateTask = () => {
       body("address").notEmpty().withMessage("Address is required"),
       body("coordinates").isArray({ min: 2, max: 2 }).withMessage("Coordinates must be an array of two floats"),
       body("completed").isBoolean().withMessage("Completed must be a boolean value"),
-      body("accepteduser").optional().isInt().withMessage("Accepted user must be a valid user ID"),
       body("rating").optional().isInt({ min: 1, max: 5 }).withMessage("Rating must be between 1 and 5"),
       body("review").optional().isString().withMessage("Review must be a valid string"),
     ];

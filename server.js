@@ -26,7 +26,7 @@ console.log(typeof login, typeof register, typeof validateLogin, typeof validate
   app.post("/login", validateLogin(), (req, res) => login(req, res));
   app.post("/register", validateRegister(), (req, res) => register(req, res));
   app.post("/createTask", authenticateJWT, validateTask(), (req,res) => createTask(req,res))
-  app.post("getUncompletedTasks", authenticateJWT, async (req, res) => getUncompletedTasks(req, res));
+  app.get("/getUncompletedTasks", authenticateJWT, async (req, res) => getUncompletedTasks(req, res));
   
 
 app.get("/", (req, res) => res.sendStatus(200));

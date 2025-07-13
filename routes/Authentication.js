@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const saltRounds = 12;
 const { v4: uuidv4 } = require("uuid");
 const pool = require("../db");
-
+const  fakeData = require("../fakeTaskData");
 // Login handler
 const login = async (req, res) => {
   const errors = validationResult(req);
@@ -17,12 +17,11 @@ const login = async (req, res) => {
     return res.status(400).json({ error: "Email and password are required or invalid" });
   } else {
       try {
-        const result = await pool.query("SELECT username, firstname, lastname, uid, password FROM users WHERE email = $1 AND password = $2", [email, password]);
-        if (result.rows.length === 0) {
-          return res.status(401).json({ error: "User not found" });
+        
+        const user = fakeData.users[email]; // Simulating a database lookup with fake data
+        if (!user) {
+          return res.status(401).json({ error: "No User Account Found" });
         }
-
-        const user = result.rows[0];
 
         const match = await bcrypt.compare(password, user.password);
         if (!match) {

@@ -1,72 +1,45 @@
-const { validationResult } = require("express-validator");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const pool = require("../db");
-const { v4: uuidv4 } = require("uuid");
+import { validationResult } from 'express-validator';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import pool from '../db.js';
+import { v4 as uuidv4 } from 'uuid';
+import { tasks } from '../fakeTaskData.js';
 
+export const createTask = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-const createTask = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    
-    const taskid = uuidv4();
+  const taskid = uuidv4();
+  const task = { ...req.body, taskid };
 
-    const {
-      user,
-      school,
-      datetimestamp,
-      title,
-      description,
-      offer,
-      address,
-      coordinates,
-      completed,
-      accepteduser,
-      rating,
-      review
-    } = req.body;
-  
-    try {
-      const result = await pool.query(
-        `INSERT INTO tasks (taskid, user, school, datetimestamp, title, description, offer, address, coordinates, completed, accepteduser, rating, review) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
-        [taskid, user, school, datetimestamp, title, description, offer, address, coordinates, completed, accepteduser, rating, review]
-      );
-  
-      res.status(201).json({ message: "Task created successfully!", task: result.rows[0] });
-    } catch (error) {
-      console.error("Database error:", error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  };
+  try {
+    console.log('Creating task with data:', task);
+    res.status(201).json({ message: 'Task created successfully!', task });
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
-  
-const getUncompletedTasks = async (req, res) => {
-    const { school } = req.body;
-  
-    if (!school) {
-      return res.status(400).json({ error: "School must be provided in the request body." });
+export const getUncompletedTasks = async (req, res) => {
+  const { school } = req.query;
+
+  if (!school) {
+    return res.status(400).json({ error: 'School must be provided in the query string.' });
+  }
+
+  try {
+    const result = tasks.filter(task => task.school === school && !task.completed);
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: 'No uncompleted tasks found for the provided school.' });
     }
-  
-    try {
-      const result = await pool.query(
-        `SELECT * FROM tasks 
-         WHERE completed = false AND school = $1`,
-        [school]
-      );
-  
-      if (result.rows.length === 0) {
-        return res.status(404).json({ message: "No uncompleted tasks found for the provided school." });
-      }
-  
-      res.status(200).json({ tasks: result.rows });
-    } catch (error) {
-      console.error("Database error:", error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  };
-  
-  
-  module.exports = { createTask, getUncompletedTasks };
+
+    res.status(200).json({ tasks: result });
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
