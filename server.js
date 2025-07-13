@@ -7,6 +7,7 @@ var bodyParser = require("body-parser");
 const { validateLogin, validateRegister, validateTask}  = require("./validation");
 const { login, register } = require("./routes/Authentication");
 const { createTask, getUncompletedTasks } = require("./routes/tasks");
+const { updateAnalytics } = require("./routes/Analytics");
 const authenticateJWT = require("./jwt");
 const pool = require("./db");
 
@@ -27,6 +28,6 @@ console.log(typeof login, typeof register, typeof validateLogin, typeof validate
   app.post("/register", validateRegister(), (req, res) => register(req, res));
   app.post("/createTask", authenticateJWT, validateTask(), (req,res) => createTask(req,res))
   app.get("/getUncompletedTasks", authenticateJWT, async (req, res) => getUncompletedTasks(req, res));
-  
+  app.post('/api/analytics',authenticateJWT, async (req, res) => updateAnalytics(req, res));
 
 app.get("/", (req, res) => res.sendStatus(200));
