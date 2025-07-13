@@ -1,11 +1,10 @@
-const { validationResult } = require("express-validator");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const pool = require("../db");
-const { v4: uuidv4 } = require("uuid");
+import { validationResult } from 'express-validator';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import pool from '../db.js';
+import { v4 as uuidv4 } from 'uuid';
 
-
-const createTask = async (req, res) => {
+export const createTask = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -43,7 +42,7 @@ const createTask = async (req, res) => {
   };
 
   
-const getUncompletedTasks = async (req, res) => {
+export const getUncompletedTasks = async (req, res) => {
     const { school } = req.body;
   
     if (!school) {
@@ -68,5 +67,3 @@ const getUncompletedTasks = async (req, res) => {
     }
   };
   
-  
-  module.exports = { createTask, getUncompletedTasks };
