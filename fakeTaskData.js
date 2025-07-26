@@ -1,35 +1,37 @@
 const tasks = [
     {
-    "user": "56789",
+    "user": 12345,
     "school": "University of California: Berkeley",
     "datetimestamp": "2025-06-04T23:28:00Z",
     "description": "Task description goes here.",
+    "title": "Help with tutoring in math.",
     "offer": 100,
     "address": "Barrow Ln, Berkeley, CA 94704",
-    "coordinates": [37.871666, -122.272781],
+    "coordinates": [-122.272781, 37.871666],
     "completed": false,
     "accepteduser": 12345,
     "rating": 5,
-    "review": "Great experience completing this task!"
+    "review": "Great experience completing this task!",
+    "taskid": "a7595098-b99d-4a0b-bc1d-409e78851b35"
     },
      {
         "user": 12345,
         "datetimestamp": "2025-07-13T00:11:47.000Z",
         "offer": 25,
-        "title": "Need a haircut",
+        "title": "I need a haircut!",
         "description": "Enter description here...",
         "address": "2650 Durant Ave, Berkeley Ca 92405 United States",
         "coordinates": [
-            37.8704509,
-            -122.2540339
+            -122.2540339,
+            37.8670322
         ],
         "completed": false,
         "school": "University of California: Berkeley",
         "taskid": "a7595098-b99d-4a0b-bc1d-409e78851b34"
     }
 ]
-const users = {
-    "defaultuser@berkeley.edu" :{
+const userData = {
+    "12345" :{
         "uid": "12345",
         "email": "defaultuser@berkeley.edu",
         "password": "$2b$12$EsyKr8v3.rgEZZ/pELvOY.2s/UXGL1dMl7koudy1AG3iQr988Y9.y",//Tasku2025!
@@ -41,4 +43,4 @@ const users = {
 
     }
 }
-module.exports = {tasks, users}
+module.exports = {tasks, userData}

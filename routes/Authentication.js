@@ -8,6 +8,7 @@ const  fakeData = require("../fakeTaskData");
 // Login handler
 const login = async (req, res) => {
   const errors = validationResult(req);
+  console.log("Login request body:", req.body);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
@@ -18,7 +19,7 @@ const login = async (req, res) => {
   } else {
       try {
         
-        const user = fakeData.users[email]; // Simulating a database lookup with fake data
+        const user = fakeData.userData["12345"]; // Simulating a database lookup with fake data
         if (!user) {
           return res.status(401).json({ error: "No User Account Found" });
         }

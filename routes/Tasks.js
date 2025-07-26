@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import pool from '../db.js';
 import { v4 as uuidv4 } from 'uuid';
-import { tasks } from '../fakeTaskData.js';
+import { tasks, userData } from '../fakeTaskData.js';
 
 export const createTask = async (req, res) => {
   const errors = validationResult(req);
@@ -23,6 +23,7 @@ export const createTask = async (req, res) => {
   }
 };
 
+
 export const getUncompletedTasks = async (req, res) => {
   const { school } = req.query;
 
@@ -31,15 +32,36 @@ export const getUncompletedTasks = async (req, res) => {
   }
 
   try {
-    const result = tasks.filter(task => task.school === school && !task.completed);
+    // First create a lookup object for users
+    const users = Array.isArray(userData) ? userData : Object.values(userData);
+    const userLookup = {};
+    users.forEach(user => {
+      if (user && user.uid) {
+        userLookup[user.uid] = {
+          uid: user.uid,
+          name: `${user.firstname || ''} ${user.lastname || ''}`.trim(),
+          email: user.email || '',
+          profilePicture: user.profilePicture || null
+        };
+      }
+    });
+
+    // Process tasks without using find()
+    const result = tasks
+      .filter(task => task.school === school && !task.completed)
+      .map(task => ({
+        ...task,
+        user: userLookup[task.user] || null
+      }));
 
     if (result.length === 0) {
       return res.status(404).json({ message: 'No uncompleted tasks found for the provided school.' });
     }
 
+    console.log('Uncompleted tasks found:', result.length);
     res.status(200).json({ tasks: result });
   } catch (error) {
-    console.error('Database error:', error);
+    console.error('Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
