@@ -4,9 +4,12 @@ const { body, validationResult } = require("express-validator");
 var bodyParser = require("body-parser");
 
 
-const { validateLogin, validateRegister, validateTask}  = require("./validation");
+const { validateLogin, validateRegister, validateTask,  validateProfileUID, validateProfileBody,validateRankings}  = require("./validation");
 const { login, register } = require("./routes/Authentication");
 const { createTask, getUncompletedTasks } = require("./routes/tasks");
+const { updateAnalytics } = require("./routes/Analytics");
+const { getProfile, updateProfile } = require("./routes/Profile");
+const { getRankings } = require("./routes/Rankings");
 const authenticateJWT = require("./jwt");
 const pool = require("./db");
 
@@ -26,7 +29,10 @@ console.log(typeof login, typeof register, typeof validateLogin, typeof validate
   app.post("/login", validateLogin(), (req, res) => login(req, res));
   app.post("/register", validateRegister(), (req, res) => register(req, res));
   app.post("/createTask", authenticateJWT, validateTask(), (req,res) => createTask(req,res))
-  app.post("getUncompletedTasks", authenticateJWT, async (req, res) => getUncompletedTasks(req, res));
-  
+  app.get("/getUncompletedTasks", authenticateJWT, async (req, res) => getUncompletedTasks(req, res));
+  app.post('/api/analytics',authenticateJWT, async (req, res) => updateAnalytics(req, res));
+  app.get("/profile/:uid",authenticateJWT, validateProfileUID(), (req, res) => getProfile(req, res));
+  app.put("/profile/:uid", authenticateJWT, validateProfileUID(), validateProfileBody(), (req, res) => updateProfile(req, res));
+  app.get("/rankings", authenticateJWT, validateRankings(), (req, res) => getRankings(req, res));
 
 app.get("/", (req, res) => res.sendStatus(200));
