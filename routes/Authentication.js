@@ -19,7 +19,7 @@ const login = async (req, res) => {
   } else {
       try {
         
-        const user = fakeData.userData["12345"]; // Simulating a database lookup with fake data
+        const user = fakeData.userData[email]; // Simulating a database lookup with fake data
         if (!user) {
           return res.status(401).json({ error: "No User Account Found" });
         }
@@ -35,10 +35,9 @@ const login = async (req, res) => {
           process.env.JWT_SECRET,
           { expiresIn: "1h" } // Token expires in 1 hour
         );
-      
-        
 
-        res.status(200).json({ token, message: `Welcome, ${user.firstname} ${user.lastname}!` });
+        res.status(200).json({ token, firstname:user.firstname,lastname:user.lastname, uid:user.uid, message: `Welcome, ${user.firstname} ${user.lastname}!` });
+
     } catch (error) {
       console.error("Database error:", error);
       res.status(500).json({ error: "Internal server error" });

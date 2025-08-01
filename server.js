@@ -2,14 +2,17 @@ require("dotenv").config();
 const express = require("express");
 const { body, validationResult } = require("express-validator");
 var bodyParser = require("body-parser");
+const { Client, Environment } = require('square');
 
 
-const { validateLogin, validateRegister, validateTask}  = require("./validation");
+const { validateLogin, validateRegister, validateTask, validateMakeOffer}  = require("./validation");
 const { login, register } = require("./routes/Authentication");
-const { createTask, getUncompletedTasks } = require("./routes/tasks");
+const { createTask, getUncompletedTasks, makeOffer } = require("./routes/tasks");
 const { updateAnalytics } = require("./routes/Analytics");
 const authenticateJWT = require("./jwt");
 const pool = require("./db");
+const processPayment = require("./SquareAPI").processPayment;
+
 
 let app = express();
 
@@ -28,6 +31,9 @@ console.log(typeof login, typeof register, typeof validateLogin, typeof validate
   app.post("/register", validateRegister(), (req, res) => register(req, res));
   app.post("/createTask", authenticateJWT, validateTask(), (req,res) => createTask(req,res))
   app.get("/getUncompletedTasks", authenticateJWT, async (req, res) => getUncompletedTasks(req, res));
+  app.get("/makeOffer", authenticateJWT, validateMakeOffer(), async (req, res) => makeOffer(req, res));
   app.post('/api/analytics',authenticateJWT, async (req, res) => updateAnalytics(req, res));
+  app.post("/process-payment", authenticateJWT, async (req, res) => processPayment(req, res));
+
 
 app.get("/", (req, res) => res.sendStatus(200));

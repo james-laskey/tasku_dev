@@ -65,3 +65,35 @@ export const getUncompletedTasks = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+export const makeOffer = (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { taskId, offer, message,uid } = req.body;
+
+  // Find the task by taskId
+  const task = tasks.find(t => t.taskid === taskId);
+  if (!task) {
+    return res.status(404).json({ error: "Task not found" });
+  }
+
+  // Create new offer object
+  const newOffer = {
+    user: userId,
+    offer: offer,
+    datetimestamp: new Date().toISOString(),
+    message: message || ""
+  };
+
+  // Append to offers array
+  task.offers.push(newOffer);
+
+  return res.status(200).json({
+    message: "Offer submitted successfully",
+    taskid: taskId,
+    updatedOffers: task.offers
+  });
+};

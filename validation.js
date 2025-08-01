@@ -47,5 +47,24 @@ const validateTask = () => {
       body("review").optional().isString().withMessage("Review must be a valid string"),
     ];
   };
+
+  const validateMakeOffer = () => {
+  return [
+    body('taskId')
+      .notEmpty()
+      .withMessage('Task ID is required'),
+
+    body('offer')
+      .isFloat({ min: 0.01 })
+      .withMessage('Offer must be a positive number'),
+
+    body('message')
+      .optional()
+      .isString()
+      .isLength({ max: 500 })
+      .withMessage('Message must be a string up to 500 characters'),
+  ];
+};
+
   
-module.exports = { validateLogin, validateRegister, validateTask };
+module.exports = { validateLogin, validateRegister, validateTask, validateMakeOffer };
