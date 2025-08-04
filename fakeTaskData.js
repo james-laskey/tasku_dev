@@ -9,8 +9,17 @@ const tasks = [
         "address": "Barrow Ln, Berkeley, CA 94704",
         "coordinates": [-122.272781, 37.871666],
         "completed": false,
-        "accepteduser": 12345,
+        "accepted": true,
+        "acceptedOffer":{
+                "user": 56789,
+                "name": "Tasker User", 
+                "phone": "123-456-7890",
+                "offer": 80, 
+                "datetimestamp": "2025-06-05T00:00:00Z", 
+                "message": "I can help with this task."
+            },
         "rating": 5,
+        "status": "Accepted",
         "review": "Great experience completing this task!",
         "taskid": "a7595098-b99d-4a0b-bc1d-409e78851b35",
         "offers": [
@@ -35,6 +44,11 @@ const tasks = [
         "completed": false,
         "school": "University of California: Berkeley",
         "taskid": "a7595098-b99d-4a0b-bc1d-409e78851b34",
+        "aacceptedOffer": null,
+        "rating": null,
+        "status": "Open",
+        "review": null,
+        'accepted': false,
         "offers": [
             {
                 "user": 56789,

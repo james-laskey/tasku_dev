@@ -11,7 +11,7 @@ const { createTask, getUncompletedTasks, makeOffer } = require("./routes/tasks")
 const { updateAnalytics } = require("./routes/Analytics");
 const authenticateJWT = require("./jwt");
 const pool = require("./db");
-const processPayment = require("./SquareAPI").processPayment;
+const processPayment = require("./SquareAPI").default.processPayment;
 
 
 let app = express();
@@ -25,7 +25,7 @@ var server = app.listen(PORT, function () {
   console.log("Listening on port number %d", server.address().port);
 });
 
-console.log(typeof login, typeof register, typeof validateLogin, typeof validateRegister);
+
   // Login Route using PostgreSQL
   app.post("/login", validateLogin(), (req, res) => login(req, res));
   app.post("/register", validateRegister(), (req, res) => register(req, res));

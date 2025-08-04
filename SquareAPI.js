@@ -1,36 +1,40 @@
-const { Client, Environment } = require('square');
+import { SquareClient } from 'square';
 
-// const squareClient = new Client({
-//   environment: Environment.Sandbox, // Change to Environment.Production for live
-//   accessToken: process.env.SQUARE_ACCESS_TOKEN, // Use .env for security
-// });
+const isSandbox = process.env.NODE_ENV !== 'production';
 
-// const paymentsApi = squareClient.paymentsApi;
-
+const client = new SquareClient({
+  token: process.env.SQUARE_ACCESS_TOKEN,
+  environment: isSandbox
+    ? 'https://connect.squareupsandbox.com'
+    : 'https://connect.squareup.com',
+    timeout: 10000,
+});
 const processPayment = async (req, res) => {
-  const { nonce, amount, currency, taskId, userId } = req.body;
-
-//   try {
-//     const response = await paymentsApi.createPayment({
-//       sourceId: nonce,
-//       idempotencyKey: `${userId}-${taskId}-${Date.now()}`,
-//       amountMoney: {
-//         amount: amount, // in cents
-//         currency: currency || 'USD',
-//       },
-//     });
-
-//     res.status(200).json({
-//       success: true,
-//       transactionId: response.result.payment.id,
-//     });
-//   } catch (error) {
-//     console.error('Payment failed:', error);
-//     res.status(500).json({
-//       success: false,
-//       error: error.message,
-//     });
-//   }
+  const { nonce, amount, currency = 'USD', taskId, userId } = req.body;
+  console.log('Processing payment:', { nonce, amount, currency, taskId, userId });
+  try {
+    const response = await client.payments.create({
+      sourceId: nonce,
+      idempotencyKey: `${userId}-${taskId}-${Date.now()}`,
+      amountMoney: {
+        amount: BigInt(amount), // amount in cents
+        currency,
+      },
+      autocomplete: true,
+      note: `Payment for task ${taskId}`,
+    });
+    console.log('Payment response:', response);
+    return res.status(200).json({
+      success: true,
+      transactionId: response.payment.id,
+    });
+  } catch (error) {
+    console.error('Payment failed:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
 };
 
-module.exports = { processPayment };
+export default { processPayment };
